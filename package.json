@@ -1,0 +1,38 @@
+{
+  "name": "nukhudro-nab",
+  "version": "0.0.0",
+  "description": "Discord music bot that can stream music from Nextcloud",
+  "main": "index.js",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "ffmpeg": "^0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "nextcloud-node-client": "^1.3.0",
+    "ts-node-dev": "^1.0.0-pre.49",
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.9.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "tsc": "tsc",
+    "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
+    "build": "tsc",
+    "start": "node ./build/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tamius-han/nukhudro.git"
+  },
+  "keywords": [
+    "discord",
+    "nextcloud",
+    "music",
+    "bot"
+  ],
+  "author": "Tamius Han",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tamius-han/nukhudro/issues"
+  },
+  "homepage": "https://github.com/tamius-han/nukhudro#readme"
+}
