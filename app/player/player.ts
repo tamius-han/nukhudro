@@ -24,8 +24,7 @@ export default class Player {
       case 'remove':
         return this.deleteConfig(message, args);
       default: 
-        // return message.channel.send(`Unknown command: \`${cmd.trim()}\``);
-        return message.channel.send(`!roll 1d20`);
+        return message.channel.send(`Unknown command: \`${cmd.trim()}\``);
     }
   }
 
