@@ -21,6 +21,8 @@ export default class Player {
   async processCommand(message: Discord.Message, cmd: string) {
     const [command, ...args] = cmd.split(' ');
     switch (command) {
+      case 'help': 
+        return this.printHelp(message);
       case 'set':
         return this.setConfig(message, args);
       case 'get':
@@ -36,6 +38,20 @@ export default class Player {
       default: 
         return message.channel.send(`Unknown command: \`${cmd.trim()}\``);
     }
+  }
+
+  async printHelp(message: Discord.Message) {
+    message.channel.send(`List of commands:
+\`\`\`
+help                    display this help
+set <conf> <value>      set config option to value
+get <conf>              get value for config option
+del <conf>              remove value for config option
+recording [start|stop]  start or stop recording voice activity
+youdontwanttodothat
+youthinkyoudobutyoudont
+\`\`\`
+    `)
   }
 
   async setConfig(message: Discord.Message, configOptions: string[]) {
