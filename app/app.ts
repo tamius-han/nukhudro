@@ -1,6 +1,11 @@
 import * as Discord from 'discord.js';
 import Player from './player/player';
 import env from './env/env';
+import { ensureDirSync } from './lib/fs-helpers';
+
+// prepare app directories:
+ensureDirSync(env.localDataDir);
+ensureDirSync(env.cacheDir);
 
 const client = new Discord.Client();
 const player = new Player(client);
@@ -28,6 +33,5 @@ client.on('message', async message => {
   }  
 
 });
-
 
 client.login(env.token);
