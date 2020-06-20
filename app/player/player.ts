@@ -1,14 +1,15 @@
 import * as Discord from 'discord.js';
 import { VoiceConnection } from './voice-connection';
 import { NextcloudManager } from '../nextcloud/NextcloudManager';
+import LibraryManager from './library-manager';
 
 export default class Player {
   libraryPaths: {[libName: string]: string} = {};
   private discordClient: Discord.Client;
-
   private voiceConnection?: VoiceConnection;
   
   private nextcloudManager: NextcloudManager;
+  private libraryManager: LibraryManager;
 
   playlist: any[] = [];
   songQueue: any[] = [];
@@ -16,6 +17,7 @@ export default class Player {
   constructor(discordClient: Discord.Client) {
     this.discordClient = discordClient;
     this.nextcloudManager = new NextcloudManager('');
+    this.libraryManager = new LibraryManager();
   }
 
   async processCommand(message: Discord.Message, cmd: string) {
@@ -32,8 +34,9 @@ export default class Player {
       case 'delete':
       case 'remove':
         return this.deleteConfig(message, args);
-      case 'youdontwanttodothat':
-      case 'youthinkyoudobutyoudont':
+      case 'lib':
+        return this.libraryManager.handle(message, args);
+      case 'cancer':
         return this.playRandom(message);
       default: 
         return message.channel.send(`Unknown command: \`${cmd.trim()}\``);
@@ -47,9 +50,8 @@ help                    display this help
 set <conf> <value>      set config option to value
 get <conf>              get value for config option
 del <conf>              remove value for config option
-recording [start|stop]  start or stop recording voice activity
-youdontwanttodothat
-youthinkyoudobutyoudont
+lib <name> ls [page]    list songs in library, 16 at a time
+cancer                  gives you ear-cancer
 \`\`\`
     `)
   }
@@ -60,7 +62,9 @@ youthinkyoudobutyoudont
       case 'lib':
       case 'library':
       case 'source':
-        this.addUpdateLibrary(message, args);
+        const [name, ...path] = args;
+        const url = path.join(' ');
+        this.libraryManager.addUpdateLibrary(message, name, url);
     }
   }
 
@@ -68,7 +72,7 @@ youthinkyoudobutyoudont
     const [option, ...args] = configOptions;
     switch (option) {
       case 'lib':
-        this.listLibraries(message, args);
+        this.libraryManager.listLibraries(message, args);
     }
   }
 
@@ -78,61 +82,8 @@ youthinkyoudobutyoudont
       case 'lib':
       case 'library':
       case 'source':
-        this.deleteLibrary(message, args);
+        this.libraryManager.deleteLibrary(message, args);
     }
-  }
-
-
-  private async listLibraries(message: Discord.Message, configOptions: string[]) {
-    if (configOptions.length === 0) {
-      let libList = 'Current libraries:';
-      for (const key in this.libraryPaths) {
-        libList = `${libList}\n${key} -> ${this.libraryPaths[key]}`;
-      }
-      return message.channel.send(libList);
-    } else {
-      let libList = 'Library data:';
-      let success = false;
-      const errorKeys: any[] = [];
-      for (const key in configOptions) {
-        if (this.libraryPaths[key] === undefined) {
-          errorKeys.push(key);
-        } else {
-          success = true;
-          libList = `${libList}\n${key} -> ${this.libraryPaths[key]}`
-        }
-      }
-      if (errorKeys.length === 0) {
-        return message.channel.send(libList);
-      }
-      
-      let errorList = 'You\'re also trying to discover something that doesn\'t exist. Following libraries are nowhere to be found:';
-      for (const key of errorKeys) {
-        errorList = `${errorList}\n  * ${key}`;
-      }
-
-      if (success) {
-        return message.channel.send(`${libList}\n\n${errorList}`);
-      } else {
-        return message.channel.send(errorList);
-      }
-    }
-  }
-
-  private async addUpdateLibrary(message: Discord.Message, configOptions: string[]) {
-    const [libraryName, libraryUrl] = configOptions;
-    if (!libraryName || !libraryUrl ) {
-      return message.channel.send('Cannot add library. libraryName or nextcloud URL are missing.');
-    }
-
-    this.libraryPaths[libraryName] = libraryUrl;
-    return message.channel.send(`Added library: ${libraryName} -> ${this.libraryPaths[libraryName]}`);
-  }
-
-  private async deleteLibrary(message: Discord.Message, configOptions: string[]) {
-    const [libraryName] = configOptions;
-    delete this.libraryPaths[libraryName];
-    return message.channel.send(`Removed library ${libraryName}`);
   }
 
   private async playRandom(message: Discord.Message) {
@@ -147,7 +98,7 @@ youthinkyoudobutyoudont
       console.log("picked file:", file)
       const fileStream = await this.nextcloudManager.getFileStream(`/of testing/${file}`);
 
-      console.log("file stream:", fileStream, fileStream.ctor);
+      console.log("file stream:", fileStream);
 
       this.voiceConnection.play(message, `/tmp/of testing/${file}`);
     } catch (err) {
