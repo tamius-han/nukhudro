@@ -34,6 +34,7 @@ client.on('message', async message => {
 
   for (const p of env.prefixes) {
     if (message.content.startsWith(p)) {
+      console.log('Got command:', message.content, 'from user:', message.author);
       player.processCommand(message, message.content.substring(p.length).trim());
     };
   }

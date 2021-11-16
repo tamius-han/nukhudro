@@ -63,6 +63,7 @@ cancer                  gives you ear-cancer
       if (!this.voiceConnection) {
         this.voiceConnection = new VoiceConnection(this.discordClient);
         await this.voiceConnection.connect(message);
+        console.info('[player::playRandom] voice connection established');
       }
 
       const files = await this.nextcloudManager.getSharedFolderContent('test');
@@ -87,6 +88,7 @@ cancer                  gives you ear-cancer
       this.voiceConnection = new VoiceConnection(this.discordClient);
       try {
         await this.voiceConnection.connect(message);
+        console.log('[player::play] Voice connection established');
       } catch (error) {
         console.error('Could not get voice connection', error);
       }

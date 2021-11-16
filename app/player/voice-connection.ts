@@ -25,13 +25,15 @@ export class VoiceConnection {
       throw 'NO_VOICE_PERMISSION';
     }
 
+    console.info('[voice-connection::connect] all seems clear — we should be able to connect to the voice channel.');
     this.connection = await this.voiceChannel.join();
+    console.info('[voice-connection::connect] connection established.');
   }
 
   async play(message: Discord.Message, stream: any) {
     if (!this.connection) {
       try {
-        this.connect(message);
+        await this.connect(message);
       } catch (error) {
         console.error('Play failed:', message);
         throw error;
@@ -46,14 +48,18 @@ export class VoiceConnection {
    * @param filePath
    */
   async playFile(message: Discord.Message, filePath: string): Promise<void> {
+    console.log('will attempt to play file:', filePath);
     if (!this.connection) {
       try {
         await this.connect(message);
+        console.info('[voice-connection::playFile] Connected');
       } catch (error) {
+        console.error('[voice-connection::playFile] error while connecting:', error);
         throw error;
       }
     }
 
+    console.log('Will play file:', filePath);
     return new Promise<void>(
       (resolve, reject) => this.connection?.play(filePath).on('finish', resolve).on('error', reject)
     );
