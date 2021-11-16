@@ -112,10 +112,13 @@ cancer                  gives you ear-cancer
         console.error('Could not play file', err);
       }
 
+      console.info('song finished.');
+
       // before switching to next song, we need to check if the song stopped playing
       // because we tried playing a different song. In that case, we let the newer
       // iteration of the loop handle everything.
-      if (currentPlayLock === this.playLock) {
+      if (currentPlayLock !== this.playLock) {
+        console.warn('Another instance has been started while current song was playing. This play loop instance will now quit.', {loopId: currentPlayLock, mostRecentLoop: this.playLock});
         return;
       }
 
@@ -136,6 +139,8 @@ cancer                  gives you ear-cancer
           this.songQueue.shift();
       }
     }
+
+    console.info('queue exhausted');
     // this.voiceConnection.play(fileStream)
   }
 }
