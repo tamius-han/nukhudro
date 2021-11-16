@@ -1,3 +1,5 @@
 node_modules/
 app/env/
 build/
+
+deepspeech-models/
